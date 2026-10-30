@@ -1,0 +1,50 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Employer dashboard | Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-heading">
+    <div><p class="eyebrow">EMPLOYER WORKSPACE</p><h1>Welcome, {{ user.first_name|default:user.username }}</h1><p>Manage your roles and keep applications moving.</p></div>
+    <a class="button" href="{% url 'job_create' %}">＋ Post a role</a>
+</div>
+<div class="stats-grid">
+    <div class="stat-card"><span>Jobs posted</span><strong>{{ job_count }}</strong></div>
+    <div class="stat-card"><span>Applications received</span><strong>{{ application_count }}</strong></div>
+    <div class="stat-card"><span>Open roles</span><strong>{{ open_job_count }}</strong></div>
+</div>
+<section class="panel">
+    <div class="panel-heading"><h2>Your job postings</h2></div>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Role</th><th>Location</th><th>Applicants</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for job in jobs %}
+            <tr><td><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></td><td>{{ job.location }}</td><td>{{ job.application_count }}</td><td>{% if job.is_active %}<span class="status offer">Active</span>{% else %}<span class="status rejected">Closed</span>{% endif %}</td></tr>
+        {% empty %}
+            <tr><td colspan="4" class="empty-row">No roles posted yet. Create your first job posting.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+</section>
+<section class="panel">
+    <div class="panel-heading"><h2>Recent applications</h2></div>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Candidate</th><th>Role</th><th>Resume</th><th>Received</th><th>Status</th><th>Update</th></tr></thead>
+        <tbody>
+        {% for application in applications %}
+            <tr>
+                <td>{{ application.applicant.get_full_name|default:application.applicant.username }}<br><span class="muted">{{ application.applicant.email }}</span></td>
+                <td>{{ application.job.title }}</td>
+                <td>{% if application.resume_file %}<a href="{% url 'resume_download' application.pk %}">Download resume</a>{% elif application.resume_url %}<a href="{{ application.resume_url }}" target="_blank" rel="noopener noreferrer">Open resume link</a>{% else %}<span class="muted">No resume</span>{% endif %}</td>
+                <td>{{ application.created_at|date:"M j, Y" }}</td>
+                <td><span class="status {{ application.status }}">{{ application.get_status_display }}</span></td>
+                <td><form class="inline-form" method="post" action="{% url 'application_status' application.pk %}">
+                    {% csrf_token %}<select name="status" aria-label="Application status for {{ application.applicant.username }}">
+                        {% for value, label in status_choices %}<option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select><button class="button" type="submit">Save</button>
+                </form></td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6" class="empty-row">Applications to your roles will appear here.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+</section>
+{% endblock %}

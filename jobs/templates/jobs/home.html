@@ -1,0 +1,84 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Find jobs | Job Portal{% endblock %}
+{% block content %}
+<section class="hero">
+    <p class="eyebrow">YOUR NEXT CHAPTER STARTS HERE</p>
+    <h1>Find work that moves you forward.</h1>
+    <p class="hero-copy">Explore opportunities from teams building what comes next.</p>
+    {% if user.is_authenticated and user.is_staff %}
+        <a class="button" href="{% url 'job_create' %}">Post a job</a>
+    {% endif %}
+</section>
+
+<section class="search-panel" aria-label="Search and filter jobs">
+    <form method="get" action="{% url 'home' %}" class="search-form">
+        <label>Role or keyword
+            <input type="search" name="q" value="{{ query }}" placeholder="e.g. Python developer">
+        </label>
+        <label>Location
+            <input type="search" name="location" value="{{ location }}" placeholder="City or region">
+        </label>
+        <label>Employment type
+            <select name="type">
+                <option value="">All types</option>
+                {% for value, label in employment_types %}
+                    <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button class="button" type="submit">Search jobs</button>
+        {% if query or location or selected_type %}<a class="clear-link" href="{% url 'home' %}">Clear filters</a>{% endif %}
+    </form>
+</section>
+
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">OPPORTUNITIES</p>
+        <h2>Latest openings</h2>
+    </div>
+    <span class="muted">{{ page_obj.paginator.count }} role{{ page_obj.paginator.count|pluralize }}</span>
+</section>
+
+<div class="job-grid">
+    {% for job in page_obj %}
+        <article class="job-card">
+            <div class="job-card-top">
+                <span class="company-avatar">{{ job.company|slice:":1"|upper }}</span>
+                <span class="badge">{{ job.get_employment_type_display }}</span>
+            </div>
+            <h3><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3>
+            <p class="company-line">{{ job.company }}</p>
+            <p class="job-meta">{{ job.location }}</p>
+            {% if job.salary_min or job.salary_max %}
+                <p class="salary">
+                    {% if job.salary_min %}₹{{ job.salary_min|floatformat:0 }}{% else %}Salary open{% endif %}
+                    {% if job.salary_max %}– ₹{{ job.salary_max|floatformat:0 }}{% endif %}
+                    <span>/ year</span>
+                </p>
+            {% else %}
+                <p class="salary">Salary not listed</p>
+            {% endif %}
+            <p class="job-excerpt">{{ job.description|truncatewords:24 }}</p>
+            <a class="text-link" href="{% url 'job_detail' job.pk %}">View role <span aria-hidden="true">→</span></a>
+        </article>
+    {% empty %}
+        <div class="empty-state">
+            <span class="empty-icon">⌕</span>
+            <h3>No matching jobs yet</h3>
+            <p>Try another title or location, or clear your filters.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+    <nav class="pagination" aria-label="Job listing pages">
+        {% if page_obj.has_previous %}
+            <a href="?q={{ query|urlencode }}&location={{ location|urlencode }}&type={{ selected_type|urlencode }}&page={{ page_obj.previous_page_number }}">← Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?q={{ query|urlencode }}&location={{ location|urlencode }}&type={{ selected_type|urlencode }}&page={{ page_obj.next_page_number }}">Next →</a>
+        {% endif %}
+    </nav>
+{% endif %}
+{% endblock %}

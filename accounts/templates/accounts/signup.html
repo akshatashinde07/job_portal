@@ -1,0 +1,23 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Create account | Job Portal{% endblock %}
+{% block content %}
+<section class="form-shell">
+    <p class="eyebrow">JOIN JOB PORTAL</p>
+    <h1>Create your account</h1>
+    <p class="muted">Choose the account type that matches how you’ll use the portal.</p>
+    <form method="post" class="portal-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+            <div class="form-field{% if field.errors %} has-error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<p class="error-text" role="alert">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        <button class="button" type="submit">Create account</button>
+    </form>
+    <p class="muted" style="margin-top: 20px;">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'jobs/site.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-wrap">
+            <a class="brand" href="{% url 'home' %}"><span class="brand-mark">J</span> Job Portal</a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="{% url 'home' %}">Find jobs</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    {% if user.is_staff %}<a href="/admin/">Admin</a>{% endif %}
+                    <form method="post" action="{% url 'logout' %}" class="nav-form">
+                        {% csrf_token %}
+                        <button class="nav-button" type="submit">Sign out</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Sign in</a>
+                    <a class="button button-small" href="{% url 'signup' %}">Create account</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        {% if messages %}
+            <div class="message-stack" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">Job Portal <span>·</span> Find a role where you can grow.</footer>
+</body>
+</html>

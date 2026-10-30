@@ -1,0 +1,45 @@
+{% extends 'jobs/base.html' %}
+{% block title %}{{ job.title }} | Job Portal{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{% url 'home' %}">← Back to jobs</a></p>
+<section class="detail-layout">
+    <article class="detail-card">
+        <div class="job-card-top">
+            <span class="company-avatar">{{ job.company|slice:":1"|upper }}</span>
+            <span class="badge">{{ job.get_employment_type_display }}</span>
+        </div>
+        <p class="eyebrow">{{ job.company }} · {{ job.location }}</p>
+        <h1>{{ job.title }}</h1>
+        <p class="job-meta">Posted {{ job.created_at|date:"M j, Y" }}</p>
+        {% if job.salary_min or job.salary_max %}
+            <p class="salary">{% if job.salary_min %}₹{{ job.salary_min|floatformat:0 }}{% else %}Salary open{% endif %}{% if job.salary_max %} – ₹{{ job.salary_max|floatformat:0 }}{% endif %} <span>/ year</span></p>
+        {% endif %}
+        {% if job.skills %}
+            <div class="tag-list">
+                {% for skill in job.skills.split|default:"" %}<span class="tag">{{ skill|cut:"," }}</span>{% endfor %}
+            </div>
+        {% endif %}
+        <h2>About the role</h2>
+        <div class="long-copy">{{ job.description|linebreaks }}</div>
+    </article>
+
+    <aside class="apply-card">
+        <h2>Interested in this role?</h2>
+        {% if is_owner %}
+            <p>This is your job posting. Review applicants from your dashboard.</p>
+            <a class="button button-full" href="{% url 'dashboard' %}">Open dashboard</a>
+        {% elif already_applied %}
+            <p class="success-text">You’ve already applied. Track your application from your dashboard.</p>
+            <a class="button button-full" href="{% url 'dashboard' %}">View my applications</a>
+        {% elif user.is_authenticated and is_seeker %}
+            <p>Send your application to {{ job.company }}.</p>
+            <a class="button button-full" href="{% url 'apply_to_job' job.pk %}">Apply for this job</a>
+        {% elif user.is_authenticated %}
+            <p>Applications are available to job seeker accounts.</p>
+        {% else %}
+            <p>Sign in as a job seeker to apply.</p>
+            <a class="button button-full" href="{% url 'login' %}?next={% url 'apply_to_job' job.pk %}">Sign in to apply</a>
+        {% endif %}
+    </aside>
+</section>
+{% endblock %}

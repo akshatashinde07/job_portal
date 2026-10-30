@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Job Portal</title>
+</head>
+<body>
+    <h1>Welcome, {{ request.user.first_name|default:request.user.username }}</h1>
+
+    {% if profile and profile.role == "employer" %}
+        <h2>Employer dashboard</h2>
+        <p>Your employer tools will appear here.</p>
+    {% elif profile %}
+        <h2>Job seeker dashboard</h2>
+        <p>Your job search and applications will appear here.</p>
+    {% else %}
+        <h2>Admin account</h2>
+        <p>Use the Django admin area to manage the platform.</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Sign out</button>
+    </form>
+</body>
+</html>

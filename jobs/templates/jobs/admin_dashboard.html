@@ -1,0 +1,23 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Admin dashboard | Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-heading">
+    <div><p class="eyebrow">PLATFORM ADMINISTRATION</p><h1>Admin overview</h1><p>Review platform activity and manage records.</p></div>
+    <a class="button" href="/admin/">Open Django Admin</a>
+</div>
+<div class="stats-grid">
+    <div class="stat-card"><span>Accounts</span><strong>{{ user_count }}</strong></div>
+    <div class="stat-card"><span>Profiles</span><strong>{{ profile_count }}</strong></div>
+    <div class="stat-card"><span>Job listings</span><strong>{{ job_count }}</strong></div>
+    <div class="stat-card"><span>Applications</span><strong>{{ application_count }}</strong></div>
+</div>
+<section class="panel">
+    <div class="panel-heading"><h2>Management tools</h2></div>
+    <div class="admin-links">
+        <a href="/admin/auth/user/">Manage users</a>
+        <a href="/admin/accounts/profile/">Manage seeker and employer profiles</a>
+        <a href="/admin/jobs/job/">Manage job listings</a>
+        <a href="/admin/jobs/application/">Manage applications</a>
+    </div>
+</section>
+{% endblock %}

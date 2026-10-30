@@ -1,0 +1,22 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Post a job | Job Portal{% endblock %}
+{% block content %}
+<section class="form-shell">
+    <p class="eyebrow">EMPLOYER STUDIO</p>
+    <h1>Post a new role</h1>
+    <p class="muted">Share the details candidates need to decide whether this role is right for them.</p>
+    <form method="post" class="portal-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+            <div class="form-field{% if field.errors %} has-error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<p class="error-text" role="alert">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        <button class="button" type="submit">Publish job</button>
+    </form>
+</section>
+{% endblock %}

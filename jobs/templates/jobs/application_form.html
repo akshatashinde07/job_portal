@@ -1,0 +1,23 @@
+{% extends 'jobs/base.html' %}
+{% block title %}Apply: {{ job.title }} | Job Portal{% endblock %}
+{% block content %}
+<section class="form-shell">
+    <p class="eyebrow">APPLICATION · {{ job.company }}</p>
+    <h1>Apply for {{ job.title }}</h1>
+    <p class="muted">Attach your resume. A short cover letter is optional.</p>
+    <form method="post" enctype="multipart/form-data" class="portal-form" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+            <div class="form-field{% if field.errors %} has-error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<p class="error-text" role="alert">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        <button class="button" type="submit">Submit application</button>
+        <a class="secondary-link" href="{% url 'job_detail' job.pk %}">Cancel</a>
+    </form>
+</section>
+{% endblock %}
